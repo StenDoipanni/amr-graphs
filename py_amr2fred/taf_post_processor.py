@@ -25,13 +25,19 @@ class TafPostProcessor:
     A class for post-processing RDF graphs by performing entity disambiguation using Word Sense Disambiguation (WSD)
     and linking entities to external knowledge bases.
     """
-    current_directory = os.path.dirname(__file__)
+    # The Wikidata-mapping DB downloaded in link_to_wikidata() is ~832MB
+    # compressed / ~1.8GB uncompressed. Defaulting to the package directory
+    # (as upstream does) can blow a small home-directory quota on HPC
+    # systems, so AMR2FRED_DATA_DIR lets it be redirected (e.g. to scratch
+    # storage) without touching the default behavior for other users.
+    current_directory = os.environ.get("AMR2FRED_DATA_DIR", os.path.dirname(__file__))
 
     def __init__(self):
         """
         Initializes the TafPostProcessor with SPARQL endpoints, namespace bindings, and WordNet POS mappings.
         """
         self.dir_path = TafPostProcessor.current_directory
+        os.makedirs(self.dir_path, exist_ok=True)
         self.framester_sparql = 'http://etna.istc.cnr.it/framester2/sparql'
         self.ewiser_wsd_url = 'https://arco.istc.cnr.it/ewiser/wsd'
         self.usea_preprocessing_url = 'https://arco.istc.cnr.it/usea/api/preprocessing'
