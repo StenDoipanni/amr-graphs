@@ -68,6 +68,7 @@ echo ""
 echo "==> Verifying environment..."
 "${PYTHON_BIN}" - <<'PY'
 import sys
+from importlib.metadata import version as pkg_version
 
 ok = True
 
@@ -80,14 +81,18 @@ def check(label, fn):
         ok = False
         print(f"  [FAIL] {label}: {e}")
 
+# Use importlib.metadata for the version string rather than each module's own
+# __version__ attribute — several small packages (unidecode, wikimapper)
+# don't define one, which would otherwise read as a false failure even
+# though the import and the package itself are fine.
 check("python", lambda: sys.version.split()[0])
-check("unidecode", lambda: __import__("unidecode").__version__)
-check("requests", lambda: __import__("requests").__version__)
-check("nltk", lambda: __import__("nltk").__version__)
-check("rdflib", lambda: __import__("rdflib").__version__)
-check("SPARQLWrapper", lambda: __import__("SPARQLWrapper").__version__)
-check("wikimapper", lambda: __import__("wikimapper").__version__)
-check("tqdm", lambda: __import__("tqdm").__version__)
+check("unidecode", lambda: (__import__("unidecode"), pkg_version("Unidecode"))[1])
+check("requests", lambda: (__import__("requests"), pkg_version("requests"))[1])
+check("nltk", lambda: (__import__("nltk"), pkg_version("nltk"))[1])
+check("rdflib", lambda: (__import__("rdflib"), pkg_version("rdflib"))[1])
+check("SPARQLWrapper", lambda: (__import__("SPARQLWrapper"), pkg_version("SPARQLWrapper"))[1])
+check("wikimapper", lambda: (__import__("wikimapper"), pkg_version("wikimapper"))[1])
+check("tqdm", lambda: (__import__("tqdm"), pkg_version("tqdm"))[1])
 
 try:
     from nltk.corpus import wordnet
