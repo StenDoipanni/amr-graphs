@@ -1,1 +1,5 @@
 useful files/
+
+__pycache__/
+*.pyc
+logs/
