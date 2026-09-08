@@ -32,7 +32,11 @@
 
 set -euo pipefail
 
-REPO_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)"
+# Slurm copies the submitted script into a spool directory and runs that
+# copy, so ${BASH_SOURCE[0]} inside the job points there, not at this file's
+# real location in the repo — use $SLURM_SUBMIT_DIR (the directory `sbatch`
+# was invoked from) instead, falling back to $PWD for manual/local runs.
+REPO_ROOT="${SLURM_SUBMIT_DIR:-$PWD}"
 cd "${REPO_ROOT}"
 # Slurm already creates logs/ itself to satisfy --output/--error above; this
 # is just a defensive no-op for local/manual runs, and must never abort the
