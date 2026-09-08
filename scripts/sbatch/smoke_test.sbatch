@@ -34,7 +34,11 @@ set -euo pipefail
 
 REPO_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)"
 cd "${REPO_ROOT}"
-mkdir -p logs
+# Slurm already creates logs/ itself to satisfy --output/--error above; this
+# is just a defensive no-op for local/manual runs, and must never abort the
+# job if it hits a transient permission/filesystem hiccup re-touching a path
+# Slurm just created.
+mkdir -p logs 2>/dev/null || true
 
 ENV_NAME="${CONDA_ENV:-amr2fred}"
 
